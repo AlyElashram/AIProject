@@ -1,3 +1,4 @@
+package code;
 import java.util.Random;
 public class CoastGuard {
     int capacity;
@@ -36,6 +37,12 @@ public class CoastGuard {
     public static String genGrid(){
         String grid_string = grid.genGrid();
         return grid_string;
+    }
+
+    public static String solve(String grid,String approach,boolean visualise){
+        
+        return "";
+
     }
 
 }
