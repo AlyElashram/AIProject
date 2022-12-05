@@ -1,53 +1,112 @@
+import java.util.ArrayList;
 import java.util.Random;
-import java.awt.Point;
+
 public class Grid {
     int width;
     int height;
-    Ship ship;
+    ArrayList<Integer> ship_location_i = new ArrayList<Integer>();
+    ArrayList<Integer> ship_location_j = new ArrayList<Integer>();
+    ArrayList<Integer> station_location_i = new ArrayList<Integer>();
+    ArrayList<Integer> station_location_j = new ArrayList<Integer>();
+    ArrayList<Ship> ships = new ArrayList<Ship>();
+    ArrayList<Station> stations = new ArrayList<Station>();
     CoastGuard coastGuard;
-    Station station;
+    int cg_i ;
+    int cg_j;
     Object[][] grid;
-    Point ship_location;
-    Point station_location;
-    Point coastGuard_location;
+
 
 
 
 
     public Grid(){
+        boolean min_ship = false;
+        boolean min_station = false;
         Random rand = new Random();
-        ship = new Ship();
-        station = new Station();
-        coastGuard = new CoastGuard();
         width = rand.nextInt(5,16);
         height = rand.nextInt(5,16);
-        grid = new Object[width][height];
-        this.ship_location = new Point(0,0);
-        this.station_location =new Point(0,0);
-        this. coastGuard_location = new Point(0,0);
+        grid = new Object[height][width];
+        for(int i =0 ; i<height;i++){
+            for (int j=0;j<width;j++){
+                int num = rand.nextInt(0,31);
+                if(num==5){
+                    Ship ship = new Ship();
+                    ships.add(ship);
+                    grid[i][j] = ship;
+                    ship_location_i.add(i);
+                    ship_location_j.add(j);
+                    min_ship = true;
+                }
+                if(num == 10){
+                    Station station = new Station();
+                    stations.add(station);
+                    grid[i][j] = station;
+                    station_location_i.add(i);
+                    station_location_j.add(j);
+                    min_station = true;
+                }
 
-        while(this.ship_location == this.station_location || this.station_location==this.coastGuard_location ||this.coastGuard_location == this.ship_location){
-            this.ship_location.x= rand.nextInt(0,width+1);
-           this.station_location.x = rand.nextInt(0,width+1);
-           this.coastGuard_location.x = rand.nextInt(0,width+1);
-
-           this.ship_location.y = rand.nextInt(0,height+1);
-           this.station_location.y =rand.nextInt(0,height+1);
-           this.coastGuard_location.y= rand.nextInt(0,height+1);
+            }
         }
-        grid[ship_location.x][ship_location.y]=ship;
-        grid[station_location.x][station_location.y] = station;
-        grid[coastGuard_location.x][coastGuard_location.y] = coastGuard;
+        //If there were no ships or stations generated then generate the minimum of at least one
+        if(!min_ship || !min_station){
+            int i_ship = rand.nextInt(0,height);
+            int j_ship = rand.nextInt(0,width);
+            int i_station = rand.nextInt(0,height);
+            int  j_station = rand.nextInt(0,width);
+            while(i_ship==i_station && j_ship==j_station){
+                i_ship = rand.nextInt(0,height);
+                j_ship = rand.nextInt(0,width);
+                i_station = rand.nextInt(0,height);
+                j_station = rand.nextInt(0,width);
+            }
+            ship_location_i.add(i_ship);
+            ship_location_j.add(j_ship);
+            station_location_i.add(i_station);
+            station_location_j.add(j_station);
+
+            Ship ship=new Ship();
+            ships.add(ship);
+            grid[i_ship][j_ship] = ship;
+
+            Station station = new Station();
+            stations.add(station);
+            grid[i_station][j_station] = station;
+
+            
+
+        }
         
+        this.cg_i = rand.nextInt(0,height);
+        this.cg_j = rand.nextInt(0,width);
+        while((ship_location_i.contains(this.cg_i) && ship_location_j.contains(this.cg_j)) || (station_location_i.contains(this.cg_i) &&station_location_j.contains(this.cg_j) )){
+            this.cg_i = rand.nextInt(0,height);
+            this.cg_j = rand.nextInt(0,width);
+        }
+
+        this.coastGuard = new CoastGuard();
+        grid[this.cg_i][this.cg_j] = this.coastGuard;
+
     } 
+   
+   
     public String genGrid(){
         String grids ="";
         grids += width+","+height+";";
-        grids+=coastGuard.capacity+";";
-        grids +=coastGuard_location.x+","+coastGuard_location.y+";";
-        grids +=station_location.x+","+station_location.y+";";
-        grids +=ship_location.x+","+ship_location.y+','+ship.numberOfPassengers+";";
+        grids+=this.coastGuard.capacity+";";
+        grids +=cg_i+","+cg_j+";";
+        for(int i=0;i<ship_location_i.size();i++){
+        grids += ship_location_i.get(i) + "," + ship_location_j.get(i) +","+ships.get(i).numberOfPassengers+";";
+        }
+        for(int i=0;i<station_location_i.size();i++){
+            grids +=station_location_i.get(i) + "," + station_location_j.get(i) +";";
+        }
+        
+       
         return grids;
 
     }
+
+
+
 }
