@@ -1,21 +1,28 @@
 package code;
- //TODO:Understand wether to mark black box as retreived and ship should be removed or not
 
-import java.util.Random;
 public class Ship {
     int numberOfPassengers;
     boolean isWreck;
     boolean isReitrivable;
+    boolean isReitrieved;
     int blackBoxDamage;
+    int locationX;
+    int locationY;
    
 
-    public Ship(){
-        Random rand = new Random();
+    public Ship(int numberOfPassengers,int locx,int locy){
+        this.locationX = locx;
+        this.locationY = locy;
         this.isWreck = false;
         this.isReitrivable = true;
         this.blackBoxDamage=0;
-        this.numberOfPassengers = rand.nextInt(1,101);
+        this.numberOfPassengers = numberOfPassengers;
     }
+
+    void reitreiveBox(){
+        this.isReitrieved = true;
+    }
+
 
     void action(){
         //
@@ -38,8 +45,6 @@ public class Ship {
         this.numberOfPassengers -= numberOfPassengers;
         return numberPickUp;
     }
-    boolean isReitrivable(){
-        return isReitrivable;
-    }
+
     
 }
