@@ -9,11 +9,13 @@ public class CoastGuard {
     int blackBoxes;
 
     public CoastGuard(){
-        Random rand = new Random();
-        capacity = rand.nextInt(30,101);
+        capacity = 0;
         numberOfPassengers = 0;
         blackBoxes = 0;
         
+    }
+    public void setCapacity(int cap){
+        this.capacity = cap;
     }
 
     
@@ -31,7 +33,7 @@ public class CoastGuard {
         }
     }
 
-    public String genGrid(){
+    public static String genGrid(){
         int width;
         int height;
         ArrayList<Integer> ship_location_i = new ArrayList<Integer>();
@@ -118,27 +120,68 @@ public class CoastGuard {
     }
 
     public static String solve(String grid,String approach,boolean visualise){
-        
+        String passengers ="";
+        String actions = "";
+        String died = "";
+        String total = "";
         if(approach.equalsIgnoreCase("BF")){
             Queue<Node> q = new LinkedList<Node>();
             CoastGuard guard = new CoastGuard();
             State initialState = new State(grid,guard);
-            Node initialNode = new Node(initialState, "", 0, 0);
+            Node initialNode = new Node(initialState, "Root", 0, 0);
             q.add(initialNode);
+
+
+
             boolean goal = false;
             while(!goal){
                 Node n = q.poll();
-                if(n.state.isGoal){break;}
-                q.add(n.moveRight());
-                q.add(n.moveUp());
-                q.add(n.moveLeft());
-                q.add(n.moveDown());
+                System.out.println("X is:"+n.state.coastGuard_x +" Y is:"+n.state.coastGuard_y+"operator is:"+n.operator);
+
+                if(n.state.isGoal){
+                    System.out.println("Goal State Found");
+                    passengers = n.state.passengersSaved +"";
+                    died=n.state.deadPassengers+"";
+                    total = n.state.totalPassengers+"";
+                    actions = "actions are "+ n.operator ;
+                    goal = true;
+                    break;
+                }
+                
+                Node add = n.moveRight();
+                if(add!=null){
+                    q.add(add);
+                }
+                add = n.moveUp();
+                if(add!=null){
+                    q.add(add);
+                }
+                add = n.moveLeft();
+                if(add!=null){
+                    q.add(add);
+                }
+                add = n.moveDown();
+                if(add!=null){
+                    q.add(add);
+                }
+                add = n.pickUp();
+                if(add!=null){
+                    q.add(add);
+                }
+                add=n.reitreive();
+                if(add!=null){
+                    q.add(add);
+                }
+                add=n.drop();
+                if(add!=null){
+                    q.add(add);
+                }
             }
             
         }
 
 
-        return"";
+        return actions +";"+ passengers +";"+total+";"+died;
     }
 
 }
