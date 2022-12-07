@@ -1,5 +1,6 @@
 package code;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
@@ -12,15 +13,22 @@ public class CoastGuard {
         capacity = 0;
         numberOfPassengers = 0;
         blackBoxes = 0;
-        
+    }
+    @Override 
+    public String toString(){
+        return this.capacity+""+this.numberOfPassengers+this.blackBoxes;
     }
     public void setCapacity(int cap){
         this.capacity = cap;
     }
+    public boolean equal(CoastGuard g){
+        if(g.capacity == this.capacity && g.numberOfPassengers == this.numberOfPassengers && g.blackBoxes == this.blackBoxes){return true;}
+        else{return false;}
+    }
 
     
     public void pickUp(Ship ship){
-        this.numberOfPassengers += ship.pickUpPassengers(this.capacity-this.numberOfPassengers);
+    this.numberOfPassengers += ship.pickUpPassengers(this.capacity-this.numberOfPassengers);
 
     }
 
@@ -32,6 +40,9 @@ public class CoastGuard {
             }
         }
     }
+
+
+
 
     public static String genGrid(){
         int width;
@@ -95,14 +106,14 @@ public class CoastGuard {
             cg_j = rand.nextInt(0,width);
         }
 
-        coastGuard = new CoastGuard();
+        //coastGuard = new CoastGuard();
 
 
 
 
         String stringGrid ="";
         stringGrid += width+","+height+";";
-        stringGrid+=coastGuard.capacity+";";
+        //stringGrid+=coastGuard.capacity+";";
         stringGrid +=cg_i+","+cg_j+";";
         
         for(int i=0;i<station_location_i.size();i++){
@@ -123,12 +134,16 @@ public class CoastGuard {
         String passengers ="";
         String actions = "";
         String died = "";
-        String total = "";
+        String reitreived = "";
+        String numberOfNodesExpanded="";
+        int numberOfNodes=0;
         if(approach.equalsIgnoreCase("BF")){
             Queue<Node> q = new LinkedList<Node>();
+            HashSet<String> nodes = new HashSet<String>();
             CoastGuard guard = new CoastGuard();
             State initialState = new State(grid,guard);
-            Node initialNode = new Node(initialState, "Root", 0, 0);
+            Node initialNode = new Node(initialState, "", 0, 0);
+            nodes.add(initialNode.toString());
             q.add(initialNode);
 
 
@@ -136,52 +151,104 @@ public class CoastGuard {
             boolean goal = false;
             while(!goal){
                 Node n = q.poll();
-                System.out.println("X is:"+n.state.coastGuard_x +" Y is:"+n.state.coastGuard_y+"operator is:"+n.operator);
-
+                n.state.checks();
                 if(n.state.isGoal){
-                    System.out.println("Goal State Found");
                     passengers = n.state.passengersSaved +"";
                     died=n.state.deadPassengers+"";
-                    total = n.state.totalPassengers+"";
-                    actions = "actions are "+ n.operator ;
-                    goal = true;
-                    break;
+                    actions =n.operator;
+                    reitreived = n.state.blackBoxesRetreived+"";
+                    numberOfNodesExpanded = numberOfNodes+"";
+                    return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+nodes.size();
+                    
                 }
+
                 
-                Node add = n.moveRight();
-                if(add!=null){
-                    q.add(add);
-                }
-                add = n.moveUp();
-                if(add!=null){
-                    q.add(add);
-                }
-                add = n.moveLeft();
-                if(add!=null){
-                    q.add(add);
-                }
-                add = n.moveDown();
-                if(add!=null){
-                    q.add(add);
-                }
-                add = n.pickUp();
-                if(add!=null){
-                    q.add(add);
+                Node add = n.pickUp();
+                
+                if(!(add==null)&&!nodes.contains(add.toString())){
+                    String[] operations = n.operator.split(",");
+                    String lastOperation = operations[operations.length-1];
+                    if(!lastOperation.equals("pickup") && !nodes.contains(add.toString())){
+                        q.add(add);
+                        nodes.add(add.toString());
+                    }
                 }
                 add=n.reitreive();
-                if(add!=null){
-                    q.add(add);
+                if(!(add==null)&&!nodes.contains(add.toString())){
+                    String[] operations = n.operator.split(",");
+                    String lastOperation = operations[operations.length-1];
+                    if(!lastOperation.equals("reitreive")&& !nodes.contains(add.toString()) && add.state.onWreck){
+                        q.add(add);
+                        nodes.add(add.toString());
+                    }
                 }
                 add=n.drop();
-                if(add!=null){
-                    q.add(add);
+                if(!(add==null)&& !nodes.contains(add.toString())){
+                    String[] operations = n.operator.split(",");
+                    String lastOperation = operations[operations.length-1];
+                    if(!lastOperation.equals("drop")&& !nodes.contains(add.toString())){
+                        q.add(add);
+                        nodes.add(add.toString());
+                    }
                 }
+
+
+
+                add = n.moveRight();
+                if(!(add==null)&& !nodes.contains(add.toString())){
+                    String[] operations = n.operator.split(",");
+                    String lastOperation = operations[operations.length-1];
+                    if(!lastOperation.equals("left")){
+                        q.add(add);
+                        nodes.add(add.toString());
+                    }
+                    
+                }
+                add = n.moveUp();
+                if(!(add==null)&& !nodes.contains(add.toString())){
+
+                    String[] operations = n.operator.split(",");
+                    String lastOperation = operations[operations.length-1];
+                    if(!lastOperation.equals("down")){
+                        q.add(add);
+                        nodes.add(add.toString());
+                    }
+                }
+                add = n.moveLeft();
+                if(!(add==null)&& !nodes.contains(add.toString())){
+                    String[] operations = n.operator.split(",");
+                    String lastOperation = operations[operations.length-1];
+                    if(!lastOperation.equals("right")){
+                        q.add(add);
+                        nodes.add(add.toString());
+                    }
+                }
+                add = n.moveDown();
+                if(!(add==null)&&!nodes.contains(add.toString())){
+                    String[] operations = n.operator.split(",");
+                    String lastOperation = operations[operations.length-1];
+                    if(!lastOperation.equals("up")){
+                        q.add(add);
+                        nodes.add(add.toString());
+                    }
+                }
+                
             }
             
         }
 
-
-        return actions +";"+ passengers +";"+total+";"+died;
+        
+        return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+numberOfNodes;
     }
+
+
+    public CoastGuard deepClone(){
+        CoastGuard g = new CoastGuard();
+        g.numberOfPassengers = this.numberOfPassengers;
+        g.blackBoxes = this.blackBoxes;
+        g.capacity =this.capacity;
+        return g;
+    }
+
 
 }

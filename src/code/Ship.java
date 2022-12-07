@@ -18,33 +18,46 @@ public class Ship {
         this.blackBoxDamage=0;
         this.numberOfPassengers = numberOfPassengers;
     }
+    public Ship(){}
 
     void reitreiveBox(){
         this.isReitrieved = true;
     }
 
 
-    void action(){
-        //
-        if(this.blackBoxDamage == 20){
+    public boolean action(){
+        if(this.blackBoxDamage >= 20){
             this.isReitrivable = false;
         }
-        else if(numberOfPassengers == 0){
+        else if(numberOfPassengers != 0){
+            this.numberOfPassengers --;
+            return true;
+            
+        }else{
             this.isWreck = true;
             this.blackBoxDamage ++;
-        }else{
-            this.numberOfPassengers --;
         }
+        return false;
     }
     int pickUpPassengers(int numberPickUp){
         if(numberPickUp >= this.numberOfPassengers){
+            int spare = this.numberOfPassengers;
             this.numberOfPassengers = 0;
-            return numberPickUp;
+            return spare;
         }
-        
-        this.numberOfPassengers -= numberOfPassengers;
+        this.numberOfPassengers -= numberPickUp;
         return numberPickUp;
     }
-
+    public Ship deepClone(){
+        Ship a = new Ship();
+        a.blackBoxDamage = this.blackBoxDamage;
+        a.isReitrieved = this.isReitrieved;
+        a.isReitrivable = this.isReitrivable;
+        a.isWreck = this.isWreck;
+        a.numberOfPassengers = this.numberOfPassengers;
+        a.locationX = this.locationX;
+        a.locationY = this.locationY;
+        return a;
+    }
     
 }

@@ -11,8 +11,10 @@ public class State {
     int coastGuard_x;
     int coastGuard_y;
     Ship currentShip;
+    Station currentStation;
     boolean onShip = false;
     boolean onStation =false;
+    boolean onWreck = false;
 
     
     ArrayList<Station> stations = new ArrayList<Station>();
@@ -24,6 +26,22 @@ public class State {
 
     boolean isGoal;
 
+    @Override
+    public String toString(){
+        String s = "";
+        s+= this.totalPassengers + this.guard.toString()+this.coastGuard_x+this.coastGuard_y+this.deadPassengers+this.passengersSaved+this.blackBoxesRetreived;
+        return s;
+    }
+    public boolean equals(State s){
+        if(s.totalPassengers == this.totalPassengers && this.guard.equal(s.guard) 
+        && this.coastGuard_x == s.coastGuard_x && this.coastGuard_y == s.coastGuard_y
+        &&this.deadPassengers == s.deadPassengers && this.passengersSaved == s.passengersSaved && this.blackBoxesRetreived == s.blackBoxesRetreived
+        ){
+            return true;
+        }else{
+            return false;
+        }
+    }
     public State(String grid,CoastGuard guard){
         this.guard = guard;
         //parse el grid ba2a hena
@@ -41,13 +59,9 @@ public class State {
             coastGuard_y = Integer.parseInt(location[1]);
             //rab3a locations of stations
             String[] stationsLocations = split[3].split(",");
-            for(int i=0;i<stationsLocations.length;i++){
-                //Even indeces are the X locations
-                //Odd indeces are the Y locations
-                //No need to create station it self as it has no maximum capcity
-                //and we are already keeping track of people saved in the states
-                int locx = -1;
-                int locy = -1;
+            int locx = -1;
+            int locy = -1;
+            for(int i=0;i<stationsLocations.length;i++){    
                 if(i%2==0){
                     locx = Integer.parseInt(stationsLocations[i]);
                 }else{
@@ -57,8 +71,8 @@ public class State {
             }
             //5amsa location and number of passengers of ship
             String[] shipsDetails = split[4].split(",");
-            int locx = -1;
-            int locy = -1;
+            locx = -1;
+            locy = -1;
             for(int i =0 ;i<shipsDetails.length;i++){
                 if(i%3==0){
                     locx = Integer.parseInt(shipsDetails[i]);
@@ -78,17 +92,20 @@ public class State {
         
 
     }
-    public State(int saved,int died,boolean onShip,boolean onStation,int reitreived,ArrayList<Ship>ships,int m, int n,int totalPassengers,
+    public State(int saved,int died,boolean onShip,boolean onWreck,Ship ship ,boolean onStation,int reitreived,ArrayList<Ship>ships,int m, int n,int totalPassengers,
     CoastGuard guard,int x,int y,ArrayList<Station> stations){
         this.passengersSaved =saved;
         this.deadPassengers = died;
         this.blackBoxesRetreived = reitreived;
+        this.currentShip = ship;
         this.ships = new ArrayList<Ship>();
-        ships.forEach(ship->this.ships.add(ship));
+        for(int i=0;i<ships.size();i++){
+            this.ships.add(ships.get(i).deepClone());
+        }
         this.m = m;
         this.n = n;
         this.totalPassengers = totalPassengers;
-        this.guard=new CoastGuard();
+        this.guard=guard.deepClone();
         this.guard.setCapacity(guard.capacity);
         this.coastGuard_x = x;
         this.coastGuard_y = y;
@@ -99,47 +116,60 @@ public class State {
 
 
     }
-   public void action(){
+   
+   public void checks(){
     boolean setGoal = true;
     boolean setShip = false;
     boolean setStation = false;
+    boolean setWreck = false;
+
     for(int i=0;i<ships.size();i++){
-        Ship current = ships.get(i);
-        
-        current.action();
-        deadPassengers++;
-        if(coastGuard_x == current.locationX && coastGuard_y ==current.locationY){
-            System.out.println("On Ship");
+        Ship current1 = ships.get(i);
+        if(coastGuard_x == current1.locationX && coastGuard_y ==current1.locationY){
             setShip = true;
+            currentShip = current1;
+            if(currentShip.isWreck){
+                setWreck = true;
+            }
         }
-        if(current.numberOfPassengers !=0 || (current.isReitrivable && !current.isReitrieved)) {
-            setGoal =false; 
-        }
+        if(current1.numberOfPassengers !=0 || (current1.isReitrivable && !current1.isReitrieved) ||guard.numberOfPassengers !=0) {
+            setGoal =false;
+        } 
         
     }
+    
     for(int i=0;i<stations.size();i++){
         Station current = stations.get(i);
         if(current.locationX == coastGuard_x && current.locationY == coastGuard_y){
             setStation = true;
+            currentStation = current;
         }
     }
     this.onShip = setShip;
     this.onStation = setStation;
     this.isGoal = setGoal;
+    this.onWreck = setWreck;
+   }
+   
+    public void action(){
+        for(int i=0;i<ships.size();i++){
+            //Check if action reduced number of passengers
+            boolean reduced = ships.get(i).action();
+            if(reduced){
+                deadPassengers++;
+            }
+        }
+
    }
 
 
-    public boolean equals(State s){
-        if(this.coastGuard_x!=s.coastGuard_x || this.coastGuard_y!=s.coastGuard_y ||
-        this.passengersSaved!=s.passengersSaved || this.blackBoxesRetreived!=s.blackBoxesRetreived){return false;}
-        
-        return true;
-    }
+   
 
     public State deepClone(){
-        return new State(this.passengersSaved,this.deadPassengers,this.onShip,this.onStation,this.blackBoxesRetreived,this.ships,this.m,this.n,this.totalPassengers,this.guard,this.coastGuard_x
+        return new State(this.passengersSaved,this.deadPassengers,this.onShip,this.onWreck,this.currentShip,this.onStation,this.blackBoxesRetreived,this.ships,this.m,this.n,this.totalPassengers,this.guard,this.coastGuard_x
         ,this.coastGuard_y,this.stations);
 
     }
+
 
 }
