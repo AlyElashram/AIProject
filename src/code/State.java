@@ -1,11 +1,10 @@
 package code;
-
 import java.util.ArrayList;
 
 public class State {
     int m;
     int n;
-    
+    int heuristicCost;
     int totalPassengers;
     CoastGuard guard;
     int coastGuard_x;
@@ -29,7 +28,10 @@ public class State {
     @Override
     public String toString(){
         String s = "";
-        s+= this.totalPassengers + this.guard.toString()+this.coastGuard_x+this.coastGuard_y+this.deadPassengers+this.passengersSaved+this.blackBoxesRetreived;
+        for(int i=0;i<ships.size();i++){
+            s+=ships.get(i).blackBoxDamage;
+        }
+        s+= this.guard.toString()+this.coastGuard_x+this.coastGuard_y+this.deadPassengers+this.blackBoxesRetreived;
         return s;
     }
     public boolean equals(State s){
@@ -71,14 +73,18 @@ public class State {
             }
             //5amsa location and number of passengers of ship
             String[] shipsDetails = split[4].split(",");
+            
             locx = -1;
             locy = -1;
             for(int i =0 ;i<shipsDetails.length;i++){
+
                 if(i%3==0){
                     locx = Integer.parseInt(shipsDetails[i]);
+
                 }
                 else if(i%3==1){
                     locy = Integer.parseInt(shipsDetails[i]);
+
                 }
                 else{
                     totalPassengers+=Integer.parseInt(shipsDetails[i]);
@@ -89,11 +95,12 @@ public class State {
 
 
 
+
         
 
     }
     public State(int saved,int died,boolean onShip,boolean onWreck,Ship ship ,boolean onStation,int reitreived,ArrayList<Ship>ships,int m, int n,int totalPassengers,
-    CoastGuard guard,int x,int y,ArrayList<Station> stations){
+    CoastGuard guard,int x,int y,ArrayList<Station> stations,int heuristicCost){
         this.passengersSaved =saved;
         this.deadPassengers = died;
         this.blackBoxesRetreived = reitreived;
@@ -149,9 +156,50 @@ public class State {
     this.onStation = setStation;
     this.isGoal = setGoal;
     this.onWreck = setWreck;
+
    }
-   
-    public void action(){
+
+
+   public void calculateHeuristic(int heuristicNumber) {
+    if (heuristicNumber == 1) {
+
+        //get passengers on ships
+        int passengersOnShips = this.totalPassengers-this.deadPassengers;
+        int blackBoxesNotRetrieved=ships.size()-this.blackBoxesRetreived;
+        if(passengersOnShips==0){
+            this.heuristicCost = blackBoxesNotRetrieved;
+
+        }
+        else{
+            this.heuristicCost = (int) Math.ceil(2 * (passengersOnShips / this.guard.capacity)) ;
+
+        }
+        }
+    
+    
+        else if (heuristicNumber == 2) {
+        int passengersOnShips = this.totalPassengers -this.deadPassengers;
+        int blackBoxesNotRetrieved=0;
+        
+
+        int passengersOnGuardShip = 0;
+        if (this.guard.numberOfPassengers > 1) {
+            passengersOnGuardShip = 1;
+        }
+        blackBoxesNotRetrieved = this.ships.size() - this.blackBoxesRetreived;
+        if(passengersOnShips==0){
+            this.heuristicCost =blackBoxesNotRetrieved+passengersOnGuardShip;
+
+        }
+        else{
+            this.heuristicCost = (int) Math.ceil(2 * (passengersOnShips / this.guard.capacity)) + passengersOnGuardShip;
+
+        }
+         }
+}
+
+
+    public int action(){
         for(int i=0;i<ships.size();i++){
             //Check if action reduced number of passengers
             boolean reduced = ships.get(i).action();
@@ -159,15 +207,18 @@ public class State {
                 deadPassengers++;
             }
         }
+        return deadPassengers;
 
    }
+
+  
 
 
    
 
     public State deepClone(){
         return new State(this.passengersSaved,this.deadPassengers,this.onShip,this.onWreck,this.currentShip,this.onStation,this.blackBoxesRetreived,this.ships,this.m,this.n,this.totalPassengers,this.guard,this.coastGuard_x
-        ,this.coastGuard_y,this.stations);
+        ,this.coastGuard_y,this.stations,this.heuristicCost);
 
     }
 

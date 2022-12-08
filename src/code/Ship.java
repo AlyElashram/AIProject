@@ -18,6 +18,7 @@ public class Ship {
         this.blackBoxDamage=0;
         this.numberOfPassengers = numberOfPassengers;
     }
+
     public Ship(){}
 
     void reitreiveBox(){
@@ -33,8 +34,12 @@ public class Ship {
             this.numberOfPassengers --;
             return true;
             
-        }else{
+        }
+        else{
             this.isWreck = true;
+
+        }
+        if(!this.isReitrieved && this.isWreck){
             this.blackBoxDamage ++;
         }
         return false;
