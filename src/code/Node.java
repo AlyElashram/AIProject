@@ -40,7 +40,7 @@ public class Node implements Comparable<Node>{
         a.operator+="left,";
 
         //Returns number of dead passengers to be the path cost
-        a.pathCost = a.state.action();
+        a.pathCost = 30*a.state.action();
         a.state.calculateHeuristic(a.heuristicFunction);
         a.depth++;
         
@@ -55,7 +55,7 @@ public class Node implements Comparable<Node>{
             return null;
         }
         a.operator+="up,";
-       a.pathCost = a.state.action();
+       a.pathCost = 30*a.state.action();
        a.state.calculateHeuristic(a.heuristicFunction);
        
        a.depth++;
@@ -72,7 +72,7 @@ public class Node implements Comparable<Node>{
         }
         a.operator+="down,";
         int pathCost = a.state.action();
-        a.pathCost = pathCost;  
+        a.pathCost = 30*pathCost;  
          a.state.calculateHeuristic(a.heuristicFunction);
         a.depth++;
         
@@ -89,7 +89,7 @@ public class Node implements Comparable<Node>{
         a.operator+="right,";
         a.depth++;
         int pathCost = a.state.action();
-        a.pathCost = pathCost; 
+        a.pathCost = 30*pathCost; 
         a.state.calculateHeuristic(a.heuristicFunction);
         
         return a;
@@ -107,7 +107,7 @@ public class Node implements Comparable<Node>{
             a.state.guard.pickUp(a.state.currentShip);
             a.operator+="pickup,";
             int pathCost = a.state.action();
-            a.pathCost = pathCost; 
+            a.pathCost = 30*pathCost; 
             a.state.calculateHeuristic(a.heuristicFunction);
             a.depth++;
             return a;
@@ -123,7 +123,7 @@ public class Node implements Comparable<Node>{
             a.state.passengersSaved += a.state.guard.numberOfPassengers;
             a.state.guard.numberOfPassengers =0;
             int pathCost = a.state.action();
-            a.pathCost = pathCost; 
+            a.pathCost = 30*pathCost; 
             a.state.calculateHeuristic(a.heuristicFunction);
             a.operator+="drop,";
             a.depth++;
@@ -141,7 +141,7 @@ public class Node implements Comparable<Node>{
             a.state.blackBoxesRetreived++;
              a.operator+="retrieve,";
              int pathCost = a.state.action();
-             a.pathCost = pathCost; 
+             a.pathCost = 30*pathCost; 
              a.state.calculateHeuristic(a.heuristicFunction);
             a.depth++;
             return a;
