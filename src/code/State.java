@@ -156,7 +156,13 @@ public class State {
 
         //get passengers on ships
         int passengersOnShips = this.totalPassengers-this.deadPassengers;
-        int blackBoxesNotRetrieved=ships.size()-this.blackBoxesRetreived;
+        int ReitrivableBlackBoxes=0;
+        for(int i=0;i<ships.size();i++){
+            if(ships.get(i).isReitrivable && !ships.get(i).isReitrieved){
+                ReitrivableBlackBoxes++;
+            }
+        }
+        int blackBoxesNotRetrieved=ReitrivableBlackBoxes-this.blackBoxesRetreived;
 
         if(passengersOnShips==0){
             this.heuristicCost = blackBoxesNotRetrieved;
@@ -178,7 +184,13 @@ public class State {
         if (this.guard.numberOfPassengers > 1) {
             passengersOnGuardShip = 1;
         }
-        blackBoxesNotRetrieved = this.ships.size() - this.blackBoxesRetreived;
+        int ReitrivableBlackBoxes=0;
+        for(int i=0;i<ships.size();i++){
+            if(ships.get(i).isReitrivable && !ships.get(i).isReitrieved){
+                ReitrivableBlackBoxes++;
+            }
+        }
+        blackBoxesNotRetrieved=ReitrivableBlackBoxes-this.blackBoxesRetreived;
         if(passengersOnShips==0){
             this.heuristicCost =blackBoxesNotRetrieved+passengersOnGuardShip;
 
