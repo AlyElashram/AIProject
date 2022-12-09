@@ -180,6 +180,8 @@ public class CoastGuard {
         HashSet<String> nodes = new HashSet<String>();
         CoastGuard guard = new CoastGuard();
         State initialState = new State(grid,guard);
+        int cg_x=initialState.coastGuard_x;
+        int cg_y = initialState.coastGuard_y;
         Node initialNode = new Node(initialState, "", 0,0,"ID");
         nodes.add(initialNode.toString());
         q.add(initialNode);
@@ -199,7 +201,7 @@ public class CoastGuard {
                     actions = n.operator;
                     reitreived = n.state.blackBoxesRetreived + "";
                     if(visualise){
-                        visualise(initialState,n);
+                        visualise(initialState,n,cg_x,cg_y);
                     }
 
                     return actions.substring(0, actions.length() - 1) + ";" + died + ";" + reitreived + ";" + nodes.size();
@@ -297,6 +299,8 @@ public class CoastGuard {
         HashSet<String> nodes = new HashSet<String>();
         CoastGuard guard = new CoastGuard();
         State initialState = new State(grid,guard);
+        int cg_x =initialState.coastGuard_x;
+        int cg_y = initialState.coastGuard_y;
         Node initialNode = new Node(initialState, "", 0,0,"DFS");
         nodes.add(initialNode.toString());
         q.add(initialNode);
@@ -310,7 +314,7 @@ public class CoastGuard {
                 actions =n.operator;
                 reitreived = n.state.blackBoxesRetreived+"";
                 if(visualise){
-                    visualise(initialState,n);
+                    visualise(initialState,n,cg_x,cg_y);
                 }
 
                 return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+nodes.size();
@@ -406,6 +410,8 @@ public class CoastGuard {
             HashSet<String> nodes = new HashSet<String>();
             CoastGuard guard = new CoastGuard();
             State initialState = new State(grid,guard);
+            int CG_x = initialState.coastGuard_x;
+            int CG_y = initialState.coastGuard_y; 
             Node initialNode = new Node(initialState, "", 0,0,"BFS");
             nodes.add(initialNode.toString());
             q.add(initialNode);
@@ -423,7 +429,7 @@ public class CoastGuard {
                     actions =n.operator;
                     reitreived = n.state.blackBoxesRetreived+"";
                     if(visualise){
-                        visualise(initialState,n);
+                        visualise(initialState,n,CG_x,CG_y);
                     }
                     return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+nodes.size();
 
@@ -523,6 +529,8 @@ public class CoastGuard {
             HashSet<String> nodes = new HashSet<String>();
             CoastGuard guard = new CoastGuard();
             State initialState = new State(grid,guard);
+            int cg_x = initialState.coastGuard_x;
+            int cg_y = initialState.coastGuard_y;
             Node initialNode = new Node(initialState, "", 0,heuristicFunc,type);
             nodes.add(initialNode.toString());
             q.add(initialNode);
@@ -538,7 +546,7 @@ public class CoastGuard {
                     reitreived = n.state.blackBoxesRetreived+"";
                     numberOfNodesExpanded = numberOfNodes+"";
                     if(visualise){
-                        visualise(initialState,n);
+                        visualise(initialState,n,cg_x,cg_y);
                     }
                     return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+numberOfNodesExpanded;
 
@@ -631,7 +639,8 @@ public class CoastGuard {
         return g;
     }
 
-    public static void visualise(State initialState,Node goal){
+    //Take String grid and not initial state and then parse it on your owns
+    public static void visualise(State initialState,Node goal,int cg_x,int cg_y){
         State state = goal.state;
         //Gets each single step into a string array and makes sure that an extra comma in the end is removed
         String[] stepsFollowed = goal.operator.substring(0,goal.operator.length()-1).split(",");
@@ -641,62 +650,60 @@ public class CoastGuard {
         //Add ship locations to hashmap for easier repeated access in the printing loop
         for(int i=0;i<ships.size();i++){
             Ship current = ships.get(i);
-            locations.put(current.locationX+""+current.locationY,"Ship");
-        }
-        System.out.println(locations.values());
+            locations.put(current.locationX+""+current.locationY,"Ship");        }
+        
         //Add station location to hasmap
         for(int i=0;i<stations.size();i++){
             Station current1 = stations.get(i);
             locations.put(current1.locationX+""+current1.locationY,"Station");
         }
-        System.out.println(locations.values());
+        
 
 
         for(int k =0 ; k<stepsFollowed.length;k++){
             //Main Loop to print the grid on each action
            System.out.println(stepsFollowed[k]);
            if(stepsFollowed[k].equals("right")){
-            state.coastGuard_y++;
+            cg_y++;
            }
 
            else if(stepsFollowed[k].equals("up")){
-            state.coastGuard_x--;
+            cg_x--;
            }
 
            else if(stepsFollowed[k].equals("down")){
-            state.coastGuard_x++;
+            cg_x++;
            }
 
            else if(stepsFollowed[k].equals("left")){
-            state.coastGuard_y--;
+            cg_y--;
            }
             System.out.println();
             String cell = "";
         //Second loop to print the multiple Horizontal lines  of the grid
         for(int i=0;i<state.n;i++){
-            
+            System.out.println("-------------------------------------------------");
             //Third loop to print the single Horizontal line of the grid
             for (int j=0;j<state.m;j++){
-                if(state.coastGuard_x == i && state.coastGuard_y ==j){
+                if(cg_x == i && cg_y ==j){
                     cell+="CG";
                 }
                 if(!(locations.get(i+""+j)==null)){
                     cell+=locations.get(i+""+j);
                 }
                 if(cell.isEmpty()){
-                    cell+="\t\t"+"||";
+                    cell+=" blank||";
                 }
                 else{
-                    cell+="    ||";
+                    cell+="||";
                 }
                 
                 System.out.print(cell);
                 cell="";
             }
             System.out.println();
-            
-    
         }
+        System.out.println();
        }
     }
 

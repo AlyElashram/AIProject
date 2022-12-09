@@ -105,7 +105,6 @@ public class Node implements Comparable<Node>{
     public Node pickUp(){
         Node a = deepClone(this);
         a.state.checks();
-       
         if(a.state.onShip && !a.state.onWreck){
             if(a.state.guard.numberOfPassengers == a.state.guard.capacity){
                 return null;
