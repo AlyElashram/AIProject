@@ -174,6 +174,7 @@ public class CoastGuard {
         {
             for(int i=0;i<=depth;i++) {
                 Node n = q.poll();
+                numberOfNodes++;
                if(n.depth > depth) break;
             
                 n.state.checks();
@@ -186,8 +187,9 @@ public class CoastGuard {
                     if(visualise){
                         visualise(initialState,n,cg_x,cg_y);
                     }
+                    System.out.println(numberOfNodes);
 
-                    return actions.substring(0, actions.length() - 1) + ";" + died + ";" + retrieved + ";" + nodes.size();
+                    return actions.substring(0, actions.length() - 1) + ";" + died + ";" + retrieved + ";" + numberOfNodes;
 
                 }
 
@@ -290,6 +292,7 @@ public class CoastGuard {
         boolean goal = false;
         while(!goal){
             Node n = q.pop();
+            numberOfNodes++;
             n.state.checks();
             if(n.state.isGoal){
 
@@ -299,8 +302,8 @@ public class CoastGuard {
                 if(visualise){
                     visualise(initialState,n,cg_x,cg_y);
                 }
-
-                return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+nodes.size();
+                System.out.println(numberOfNodes);
+                return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+numberOfNodes;
 
             }
 
@@ -402,6 +405,7 @@ public class CoastGuard {
 
             while(!goal){
                 Node n = q.poll();
+                numberOfNodes++;
 
                 n.state.checks();
 
@@ -414,7 +418,8 @@ public class CoastGuard {
                     if(visualise){
                         visualise(initialState,n,CG_x,CG_y);
                     }
-                    return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+nodes.size();
+                    System.out.println(numberOfNodes);
+                    return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+numberOfNodes;
 
                 }
 
@@ -531,7 +536,8 @@ public class CoastGuard {
                     if(visualise){
                         visualise(initialState,n,cg_x,cg_y);
                     }
-                    return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+numberOfNodesExpanded;
+                    System.out.println(numberOfNodes);
+                    return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+numberOfNodes;
 
                 }
 
