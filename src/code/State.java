@@ -34,16 +34,7 @@ public class State {
         s+= this.guard.toString()+this.coastGuard_x+this.coastGuard_y+this.deadPassengers+this.blackBoxesRetreived;
         return s;
     }
-    public boolean equals(State s){
-        if(s.totalPassengers == this.totalPassengers && this.guard.equal(s.guard) 
-        && this.coastGuard_x == s.coastGuard_x && this.coastGuard_y == s.coastGuard_y
-        &&this.deadPassengers == s.deadPassengers && this.passengersSaved == s.passengersSaved && this.blackBoxesRetreived == s.blackBoxesRetreived
-        ){
-            return true;
-        }else{
-            return false;
-        }
-    }
+
     public State(String grid,CoastGuard guard){
         this.guard = guard;
         //parse el grid ba2a hena
@@ -166,21 +157,22 @@ public class State {
         //get passengers on ships
         int passengersOnShips = this.totalPassengers-this.deadPassengers;
         int blackBoxesNotRetrieved=ships.size()-this.blackBoxesRetreived;
+
         if(passengersOnShips==0){
             this.heuristicCost = blackBoxesNotRetrieved;
-
         }
         else{
             this.heuristicCost = (int) Math.ceil(2 * (passengersOnShips / this.guard.capacity)) ;
+        }
+
 
         }
-        }
     
     
-        else if (heuristicNumber == 2) {
+    else if (heuristicNumber == 2) {
         int passengersOnShips = this.totalPassengers -this.deadPassengers;
         int blackBoxesNotRetrieved=0;
-        
+
 
         int passengersOnGuardShip = 0;
         if (this.guard.numberOfPassengers > 1) {
@@ -195,10 +187,14 @@ public class State {
             this.heuristicCost = (int) Math.ceil(2 * (passengersOnShips / this.guard.capacity)) + passengersOnGuardShip;
 
         }
-         }
+    }
 }
 
 
+    //This function is called after every action
+    //It fetches all the ships and does the logic (Adding damage to black box or reducing passenger)
+    //If it reduces passengers it returns true so that we can track in the state how many passengers died without having
+    //to loop on each ship again to track
     public int action(){
         for(int i=0;i<ships.size();i++){
             //Check if action reduced number of passengers

@@ -25,10 +25,7 @@ public class CoastGuard {
     public void setCapacity(int cap){
         this.capacity = cap;
     }
-    public boolean equal(CoastGuard g){
-        if(g.capacity == this.capacity && g.numberOfPassengers == this.numberOfPassengers && g.blackBoxes == this.blackBoxes){return true;}
-        else{return false;}
-    }
+
 
     
     public void pickUp(Ship ship){
@@ -37,7 +34,7 @@ public class CoastGuard {
     }
 
 
-    public void reitreiveBox(Ship ship){
+    public void retrieveBox(Ship ship){
         if(ship.isWreck){
             if(ship.isReitrivable){
                 blackBoxes++;
@@ -51,7 +48,7 @@ public class CoastGuard {
    public static String genGrid(){
        int width;
        int height;
-       ArrayList<Station> stations = new ArrayList<Station>();
+       ArrayList<Station> stations = new ArrayList<>();
        ArrayList<Ship> ships = new ArrayList<Ship>();
        int cg_x ;
        int cg_y;
@@ -120,11 +117,6 @@ public class CoastGuard {
            cg_x = rand.nextInt(0,height);
            cg_y = rand.nextInt(0,width);
        }
-
-
-
-
-
        String stringGrid ="";
        stringGrid += width+","+height+";";
        //Adding Coast Guard Capacity
@@ -151,29 +143,20 @@ public class CoastGuard {
    }
 
     public static String solve(String grid,String approach,boolean visualise){
-        String solution="";
-        if(approach.equals("BF")){
-        solution = BFS(grid,visualise);
-        }
-        else if(approach.equals("DF")){
-            solution = DFS(grid,visualise);
-        }
-        else if(approach.equals("ID")){
-            solution = ID(grid,visualise);
-        }
-       else {
-        solution = GreedyAndAstar(grid, visualise, approach);
-       }
+        return  switch (approach) {
+            case "BF" -> BFS(grid, visualise);
+            case "DF" -> DFS(grid, visualise);
+            case "ID" -> ID(grid, visualise);
+            default -> GreedyAndAstar(grid, visualise, approach);
+        };
 
-        
-        return solution;
     }
 
     public static String ID(String grid ,boolean visualise){
 
         String actions = "";
         String died = "";
-        String reitreived = "";
+        String retrieved = "";
 
         int numberOfNodes=0;
         Queue<Node> q = new LinkedList<Node>();
@@ -199,12 +182,12 @@ public class CoastGuard {
 
                     died = n.state.deadPassengers + "";
                     actions = n.operator;
-                    reitreived = n.state.blackBoxesRetreived + "";
+                    retrieved = n.state.blackBoxesRetreived + "";
                     if(visualise){
                         visualise(initialState,n,cg_x,cg_y);
                     }
 
-                    return actions.substring(0, actions.length() - 1) + ";" + died + ";" + reitreived + ";" + nodes.size();
+                    return actions.substring(0, actions.length() - 1) + ";" + died + ";" + retrieved + ";" + nodes.size();
 
                 }
 
@@ -219,7 +202,7 @@ public class CoastGuard {
                         nodes.add(add.toString());
                     }
                 }
-                add = n.reitreive();
+                add = n.retrieve();
                 if (!(add == null) && !nodes.contains(add.toString())) {
                     String[] operations = n.operator.split(",");
                     String lastOperation = operations[operations.length - 1];
@@ -283,7 +266,7 @@ public class CoastGuard {
 
 
 
-        return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+numberOfNodes;
+        return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+numberOfNodes;
 
     }
 
@@ -291,7 +274,7 @@ public class CoastGuard {
 
         String actions = "";
         String died = "";
-        String reitreived = "";
+        String retrieved = "";
 
         int numberOfNodes=0;
 
@@ -312,12 +295,12 @@ public class CoastGuard {
 
                 died=n.state.deadPassengers+"";
                 actions =n.operator;
-                reitreived = n.state.blackBoxesRetreived+"";
+                retrieved = n.state.blackBoxesRetreived+"";
                 if(visualise){
                     visualise(initialState,n,cg_x,cg_y);
                 }
 
-                return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+nodes.size();
+                return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+nodes.size();
 
             }
 
@@ -332,7 +315,7 @@ public class CoastGuard {
                     nodes.add(add.toString());
                 }
             }
-            add=n.reitreive();
+            add=n.retrieve();
             if(!(add==null)&&!nodes.contains(add.toString())){
                 String[] operations = n.operator.split(",");
                 String lastOperation = operations[operations.length-1];
@@ -396,14 +379,14 @@ public class CoastGuard {
 
 
 
-        return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+numberOfNodes;
+        return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+numberOfNodes;
     }
 
     public static String BFS(String grid,boolean visualise){
 
         String actions = "";
         String died = "";
-        String reitreived = "";
+        String retrieved = "";
 
         int numberOfNodes=0;
             Queue<Node> q = new LinkedList<Node>();
@@ -427,11 +410,11 @@ public class CoastGuard {
 
                     died=n.state.deadPassengers+"";
                     actions =n.operator;
-                    reitreived = n.state.blackBoxesRetreived+"";
+                    retrieved = n.state.blackBoxesRetreived+"";
                     if(visualise){
                         visualise(initialState,n,CG_x,CG_y);
                     }
-                    return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+nodes.size();
+                    return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+nodes.size();
 
                 }
 
@@ -446,7 +429,7 @@ public class CoastGuard {
                         nodes.add(add.toString());
                     }
                 }
-                add=n.reitreive();
+                add=n.retrieve();
                 if(!(add==null)&&!nodes.contains(add.toString())){
                     String[] operations = n.operator.split(",");
                     String lastOperation = operations[operations.length-1];
@@ -510,7 +493,7 @@ public class CoastGuard {
 
 
 
-        return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+numberOfNodes;
+        return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+numberOfNodes;
     }
 
     public static String GreedyAndAstar(String grid,boolean visualise,String type){
@@ -522,7 +505,7 @@ public class CoastGuard {
         }
         String actions = "";
         String died = "";
-        String reitreived = "";
+        String retrieved = "";
         String numberOfNodesExpanded="";
         int numberOfNodes=0;
             Queue<Node> q = new PriorityQueue<Node>();
@@ -543,12 +526,12 @@ public class CoastGuard {
                 if(n.state.isGoal){
                     died=n.state.deadPassengers+"";
                     actions =n.operator;
-                    reitreived = n.state.blackBoxesRetreived+"";
+                    retrieved = n.state.blackBoxesRetreived+"";
                     numberOfNodesExpanded = numberOfNodes+"";
                     if(visualise){
                         visualise(initialState,n,cg_x,cg_y);
                     }
-                    return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+numberOfNodesExpanded;
+                    return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+numberOfNodesExpanded;
 
                 }
 
@@ -563,7 +546,7 @@ public class CoastGuard {
                         nodes.add(add.toString());
                     }
                 }
-                add=n.reitreive();
+                add=n.retrieve();
                 if(!(add==null)&&!nodes.contains(add.toString())){
                     String[] operations = n.operator.split(",");
                     String lastOperation = operations[operations.length-1];
@@ -627,7 +610,7 @@ public class CoastGuard {
 
 
 
-        return actions.substring(0,actions.length()-1) +";"+ died +";"+reitreived+";"+numberOfNodes;
+        return actions.substring(0,actions.length()-1) +";"+ died +";"+ retrieved +";"+numberOfNodes;
 
     }
    
@@ -652,7 +635,7 @@ public class CoastGuard {
             Ship current = ships.get(i);
             locations.put(current.locationX+""+current.locationY,"Ship");        }
         
-        //Add station location to hasmap
+        //Add station location to hashmap
         for(int i=0;i<stations.size();i++){
             Station current1 = stations.get(i);
             locations.put(current1.locationX+""+current1.locationY,"Station");

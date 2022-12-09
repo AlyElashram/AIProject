@@ -27,15 +27,7 @@ public class Node implements Comparable<Node>{
         return s;
     }
 
-    @Override
-    public boolean equals(Object a){
-        Node n = (Node) a ;
-        if(n.state.equals(this.state) && this.operator.equals(n.operator) && this.depth == n.depth && n.pathCost == this.pathCost){
-            return true;
-        }else{
-            return false;
-        }
-    }
+
 
     public Node moveLeft (){
         Node a = deepClone(this);
@@ -46,8 +38,9 @@ public class Node implements Comparable<Node>{
             return null;
         }
         a.operator+="left,";
-        int pathCost = a.state.action();
-        a.pathCost = pathCost; 
+
+        //Returns number of dead passengers to be the path cost
+        a.pathCost = a.state.action();
         a.state.calculateHeuristic(a.heuristicFunction);
         a.depth++;
         
@@ -62,8 +55,7 @@ public class Node implements Comparable<Node>{
             return null;
         }
         a.operator+="up,";
-       int pathCost = a.state.action();
-       a.pathCost = pathCost; 
+       a.pathCost = a.state.action();
        a.state.calculateHeuristic(a.heuristicFunction);
        
        a.depth++;
@@ -139,12 +131,12 @@ public class Node implements Comparable<Node>{
         }
         return null;
     }
-    public Node reitreive(){
+    public Node retrieve(){
         Node a = deepClone(this);
         a.state.checks();
         
         if(a.state.onWreck && a.state.currentShip.isReitrivable){
-            a.state.guard.reitreiveBox(a.state.currentShip);
+            a.state.guard.retrieveBox(a.state.currentShip);
             a.state.currentShip.isReitrieved = true;
             a.state.blackBoxesRetreived++;
              a.operator+="retrieve,";
